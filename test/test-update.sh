@@ -113,6 +113,23 @@ git lfs pre-commit \"\$@\""
 )
 end_test
 
+begin_test "update pre-commit hook"
+(
+  set -e
+
+  pre_commit_hook="#!/bin/sh
+command -v git-lfs >/dev/null 2>&1 || { echo >&2 \"\\nThis repository is configured for Git LFS but 'git-lfs' was not found on your path. If you no longer wish to use Git LFS, remove this hook by deleting .git/hooks/pre-commit.\\n\"; exit 2; }
+git lfs pre-commit \"\$@\""
+
+  mkdir without-pre-commit
+  cd without-pre-commit
+  git init
+
+  [ "Updated pre-commit hook." = "$(git lfs update)" ]
+  [ "$pre_commit_hook" = "$(cat .git/hooks/pre-commit)" ]
+)
+end_test
+
 begin_test "update lfs.{url}.access"
 (
   set -e
